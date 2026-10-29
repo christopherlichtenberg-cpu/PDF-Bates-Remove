@@ -1,0 +1,89 @@
+PDF OCR Layer Tool - v1.1
+================================================
+
+This folder is self-contained. Copy the whole folder to the test machine
+(USB stick, network share, etc.) - no Python or any other install is
+required there.
+
+To run:
+  Double-click "PDF OCR Layer Tool.exe"
+
+First launch:
+  You'll see a "First Run Setup" screen asking for your Adobe Acrobat
+  location. This isn't used by anything in the current build - it's fine
+  to click "Skip for now".
+
+NEW in v1.1 - removing Bates stamps burned into page images
+-----------------------------------------------------------
+v1.0 could only remove TEXT. On productions where each page is a single
+image with the Bates number burned into the pixels, there is no text object
+for the stamp, so v1.0 either reported "no OCR layer found" or removed only
+the hidden OCR copy of the number while the visible stamp stayed.
+
+The new third option, "Remove pattern from page images (OCR within a
+selected region)", fixes this. It is NOT the default - it is slower, so the
+intended workflow is:
+
+  1. Run the normal "Strip matching pattern only" option over the folder.
+  2. Collect the files that log "no OCR layer found" or still show a
+     visible stamp, and run this option over just those.
+
+How to use it:
+  1. Enter your Bates regex in the pattern box (same box as before).
+  2. Choose "Remove pattern from page images...".
+  3. Click "Select Region...". A preview of the first PDF in the input
+     folder appears (pick another sample from the list or Browse...).
+  4. Drag a box over where the stamp sits (e.g. the bottom-right corner).
+     Draw it a little larger than the stamp - its position can shift
+     slightly between pages. The same region is applied to every page of
+     every file.
+  5. Click "Test OCR on this page" - matches that would be removed are
+     outlined in green, and you can see what OCR read inside the region.
+     Use Prev/Next to check a few pages. Then "Save Region".
+  6. RUN.
+
+What it does: only the selected region of each page is OCR'd. Text found
+there that matches your pattern is erased from the page image itself
+(the pixels are changed to white - the stamp is genuinely removed, not
+covered by a box), along with any hidden OCR text matching the pattern.
+Nothing else on the page is touched.
+
+Check the log: if a page in a file had no match in the region (stamp
+outside the box, or OCR couldn't read it) the file is marked with a
+warning listing those page numbers. Those pages are left unchanged.
+
+Other options (unchanged from v1.0)
+-----------------------------------
+  - "Strip entire OCR text layer": flattens every page to a plain image at
+    300 DPI. The page looks exactly the same as before, but it's now fully
+    non-searchable/no text layer at all - a "dead" PDF for search purposes.
+    This is deliberately unconditional - it doesn't try to guess which text
+    is "real" OCR vs genuine content, so don't run this mode against
+    documents you want to remain searchable.
+  - "Strip matching pattern only": surgically removes just the text that
+    matches a regex pattern you provide (e.g. a Bates number format),
+    leaving everything else untouched - including removing it from view if
+    that matched text happened to be visible.
+  - Process a whole folder (optionally including subfolders)
+  - Output to a separate folder, overwrite originals, or add a
+    prefix/suffix to filenames
+  - Write a run log (and an error log, if anything failed) next to the
+    output files, listing exactly what happened to every file
+
+Note on file size: flattening replaces the page's text/vector content with
+a raster image, so output files can end up larger than the originals.
+Image-region mode re-encodes only the page images it changes; very
+compact black-and-white scans may also grow somewhat.
+
+Where things get saved:
+  - config.json (your last-used settings, including the search region) is
+    created next to this .exe the first time you run it.
+  - Run logs / error logs are saved into the output folder you choose
+    (or the input folder, if you chose "Overwrite originals").
+
+If it doesn't seem to do anything when you double-click it:
+  Windows Defender / SmartScreen sometimes takes a few seconds to scan an
+  unrecognized .exe the first time it's run from a new machine - give it
+  a moment. If SmartScreen shows a blue "Windows protected your PC"
+  warning, click "More info" then "Run anyway" (this happens because the
+  .exe isn't code-signed, not because anything is wrong with it).

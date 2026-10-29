@@ -1,0 +1,2 @@
+pymupdf>=1.26
+pywin32; sys_platform == "win32"
