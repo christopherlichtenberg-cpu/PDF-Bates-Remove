@@ -5,8 +5,11 @@ REM     py -m pip install -r requirements-dev.txt
 REM     build.bat
 REM The tessdata folder (OCR language data for image-region mode) is bundled
 REM inside the .exe; nothing extra needs copying to the target machine.
+REM Set PYTHON to use a specific interpreter (the GitHub build sets it).
 
-py -m PyInstaller --noconfirm --clean --onefile --windowed ^
+if "%PYTHON%"=="" set PYTHON=py
+
+%PYTHON% -m PyInstaller --noconfirm --clean --onefile --windowed ^
     --name "PDF OCR Layer Tool" ^
     --add-data "tessdata;tessdata" ^
     main.py
